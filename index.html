@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html ng-app="masonryApp">
+<head>
+	<title>Image Gallery</title>
+	<script src="jquery.min.js"></script>
+	<script src="angular.min.js"></script>
+	<script src="ng-infinite-scroll.min.js"></script>
+	<script src="angular-masonry.js"></script>
+	<script src="imagesLoaded.js"></script>
+	<script src="app.js"></script>
+</head>
+<body data-ng-controller="LoadImages" style="margin: 0 25px 0; padding: 0 15px 0;">
+
+	<div>
+		<button  style="position: relative; left: 45%; height: 40px;" ng-click="refresh()">New page</button>
+	</div>
+
+	<div infinite-scroll="fetchNext()" infinite-scroll-distance="1" style="display:inline-block; width:100%; height:100%">
+		<div data-images-loaded data-masonry data-x-margin="20" data-y-margin="30" data-img-width="250" style="margin:3% 2% 0 2%; padding: 20px 1% 0; border:1px solid black;">
+			<div data-ng-repeat="image in images" style="border:1px solid black; border-radius:5px; padding:1px;">
+					<img ng-src="http://lorempixel.com/{{image.src}}">
+				<div>Foo Bar</div>
+				
+			</div>
+		</div>
+	</div>
+
+</body>
+</html>

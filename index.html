@@ -12,7 +12,7 @@
 <body data-ng-controller="LoadImages" style="margin: 0 25px 0; padding: 0 15px 0;">
 
 	<div>
-		<button  style="position: relative; left: 45%; height: 40px;" ng-click="refresh()">New page</button>
+		<p style="position: relative; left: 45%; height: 40px;" ng-click="refresh()">{{imagesProgress}} %</p>
 	</div>
 
 	<div infinite-scroll="fetchNext()" infinite-scroll-distance="1" style="display:inline-block; width:100%; height:100%">

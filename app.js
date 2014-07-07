@@ -32,6 +32,14 @@ angular.module('masonryApp', ['masonryLayout', 'infinite-scroll', 'imagesLoaded'
 
         }
 
-    };   
+    };  
+
+    $scope.$on('QUARTER', function() {
+        console.log("QUARTER DONE");
+    }); 
+
+    $scope.$on('ALWAYS', function() {
+        console.log("COMPLETED");
+    });
 
 }])

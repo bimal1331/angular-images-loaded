@@ -7,6 +7,13 @@
 
 		var cache = {};
 
+		var broadcastMessages = {
+			progress : ['QUARTER', 'HALF', 'THREEQUARTERS', 'FULL'],
+			successful : 'SUCCESS',
+			complete : 'FAIL',
+			always : 'ALWAYS'
+		};
+
 		/************* Helper functions **********/
 		function digestPromise(func) {
 			$timeout(func, 0);
@@ -30,13 +37,48 @@
 			return arr;
 		}
 
-		/*********** Constructor function ************/
-		function ImagesCollection() {
+		/*********** Constructors ************/
 
-			this.imagesCount;
+		function ImageNode(src, func, inBrowserCache) {
+			this.loaded = undefined;
+			this.loading = true;
+
+			if(!inBrowserCache) {				
+				this.node = new Image();
+				this.bind(func);
+				this.node.src = src;
+			}
+			else {
+				this.__onload(func, true);
+			}
+			
+		}
+
+		ImageNode.prototype = {
+			constructor : ImageNode,
+
+			bind : function(func) {
+				var _this = this;
+				this.node.addEventListener('load', function() { _this.__onload(func, true) }, false);
+				this.node.addEventListener('error', function() { _this.__onload(func, false) }, false);
+			},
+
+			__onload : function(func, success) {
+				this.loaded = success;
+				this.loading = false;
+
+				if(success && this.node) {
+					delete this.node;
+				}				
+
+				func(success);
+			}
+		};
+
+		function ImagesCollection() {
+			this.imagesCount = 0;
 			this.imagesLoaded = 0;
 			this.imagesFailed = 0;
-
 		}
 
 		ImagesCollection.prototype = {
@@ -45,9 +87,8 @@
 			whenImagesLoaded : function(imageNodes) {
 				var defer = $q.defer(),
 					totalImages = imageNodes.length,
-					progressIndicators = [undefined, 'QUARTER', 'HALF', 'THREEQUARTERS', 'COMPLETE'],
 					_this = this,
-					imgElem, proxyImage, progress;
+					imgElem, proxyImage;
 
 				this.imagesCount = totalImages;
 
@@ -57,99 +98,60 @@
 					check(imgElem);					
 				}
 
-				function loaded(bool) {
+				function increment(bool) {
+					var progress;
+
 					if(bool) {
 						_this.imagesLoaded++;
 					}
 					else {
 						_this.imagesFailed++;
 					}
-					
-					console.log('loaded', _this.imagesLoaded, _this.imagesFailed)
 
-					if((progress = (_this.imagesLoaded + _this.imagesFailed)/Math.ceil(totalImages/4)) && (progress % 1 === 0)) {
+					if((progress = (_this.imagesLoaded + _this.imagesFailed)/Math.ceil(totalImages/4)) && (progress % 1 === 0) && progress < 4) {
 						digestPromise(function() {
-							defer.notify(progressIndicators[progress]);
+							defer.notify(broadcastMessages.progress[progress-1]);
 						});
 					}
 
 					if(_this.imagesLoaded + _this.imagesFailed === _this.imagesCount) {
 						digestPromise(function() {
-							defer.resolve((_this.imagesFailed > 0) ? 'COMPLETE' : 'SUCCESS');
-							defer.resolve('ALWAYS');
+							defer.notify(broadcastMessages.progress[3]);
+							defer.resolve((_this.imagesFailed > 0) ? broadcastMessages.complete : broadcastMessages.success);
 						});
 					}
 
 				}
 
 				function check(img) {
-					var cachedElement = cache[img.src],
+					var source = img.src,
+						cachedElement = cache[source],
 						proxyImage;
-
-					var onload = function onload() {
-							// console.log('PROXY IMAGE', this);
-							cache[img.src].loaded = true; 
-							cache[img.src].loading = false;
-							loaded(true);
-							unbind();
-						};
-
-						var onerror = function onerror() {
-							// console.log(img.src)
-							cache[img.src].loaded = false;
-							cache[img.src].loading = false;
-							loaded(false);
-							unbind();
-						};
-
-						var unbind = function unbind() {
-							cache[img.src].node.removeEventListener('load', onload, false);
-							cache[img.src].node.removeEventListener('error', onerror, false);
-						};
 
 					if(cachedElement ) {
 
 						if(cachedElement.loaded) {
 							//Image is in local cache and is loaded
-							console.log('LOCAL CACHE');
-							loaded(true);
+							increment(true);
 						}
 						else if(cachedElement.loading) {
-							//HACK
-							console.log('LOADING');
-							cache[img.src].node.addEventListener('load', onload, false);
-							cache[img.src].node.addEventListener('error', onerror, false);
-							// loaded(true);
+							//Image is currently being loaded and it's being checked again before successful load, so we wait for the image to load
+							cachedElement.bind(increment);
 						}
 						else if(cachedElement.loaded === false) {
-							cache[img.src].node.addEventListener('load', onload, false);
-							cache[img.src].node.addEventListener('error', onerror, false);
-							cache[img.src].node.src = img.src;
+							cachedElement.bind(increment);
+							cachedElement.node.src = source;
 						}
-						// loaded(true);
+						
 					}
 					else if(img.complete && img.naturalWidth > 0) {
 						//Image is not in local cache but is present in browser's cache
-						// console.log('BROWSER CACHE');
-						cachedElement = {loaded : true};
-						loaded(true);
+						cache[source] = new ImageNode(source, increment, true);
 					}
 					else {
 						//Image has not been loaded before, so we make a proxy image element and attach load listeners to it so that we don't interfere with the user defined listeners
-						// proxyImage = new Image();
+						cache[source] = new ImageNode(source, increment);
 
-						cache[img.src] = {
-							node : new Image(),
-							loaded : undefined,
-							loading : true
-						};
-
-						
-
-						cache[img.src].node.addEventListener('load', onload, false);
-							cache[img.src].node.addEventListener('error', onerror, false);
-
-						cache[img.src].node.src = img.src;
 					}
 
 				}
@@ -160,6 +162,7 @@
 			
 		};
 
+		//Directive consfiguration object
 		return {
 			restrict : 'A',
 			link : function($scope, $element, $attrs) {
@@ -174,9 +177,9 @@
 						
 						return nodes;
 					},
-					function(newVal, oldVal) {
+					function(newVal) {
 
-						if(newVal === oldVal) return;
+						if(!newVal) return;
 
 						var collection = new ImagesCollection(),
 							imageNodes = makeArray($element.find('img')),
@@ -188,6 +191,7 @@
 							collection.whenImagesLoaded(currentImageNodes).then(
 								function(data) {
 									$scope.$broadcast(data);
+									$scope.$broadcast(broadcastMessages.always);
 								},
 								function(error) {
 

@@ -33,9 +33,9 @@ http://bimal1331.github.io/angular-images-loaded
   That's it!
 
 #####EVENTS(Always available)
-+ SUCCESS - All images have been successfully loaded
-+ FAIL - All images have been loaded with atleast 1 failed image
-+ ALWAYS - All images are done, whether successfully loaded or failed to load. This event is always broadcasted
++ ***SUCCESS*** - All images have been successfully loaded
++ ***FAIL*** - All images have been loaded with atleast 1 failed image
++ ***ALWAYS*** - All images are done, whether successfully loaded or failed to load. This event is always broadcasted
   
   ***Subscribe to these events in your controller as shown below***
 
@@ -54,10 +54,10 @@ http://bimal1331.github.io/angular-images-loaded
   ```
   
 #####PROGRESS EVENTS
-+ QUARTER - One fourth of total images have been loaded/failed.
-+ HALF - Half of total images have been loaded/failed.
-+ THREEQUARTERS - Three fourth of total images have been loaded/failed.
-+ FULL - All images have been loaded/failed.
++ ***QUARTER*** - One fourth of total images have been loaded/failed
++ ***HALF*** - Half of total images have been loaded/failed
++ ***THREEQUARTERS*** - Three fourth of total images have been loaded/failed
++ ***FULL*** - All images have been loaded/failed
 
   Main event is ***PROGRESS***, other events are received in the callback via ***progress.status***
 

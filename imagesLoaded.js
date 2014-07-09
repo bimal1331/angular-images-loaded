@@ -75,10 +75,11 @@
 			}
 		};
 
-		function ImagesCollection() {
+		function ImagesCollection(useProgressEvents) {
 			this.imagesCount = 0;
 			this.imagesLoaded = 0;
 			this.imagesFailed = 0;
+			this.useProgressEvents = useProgressEvents;
 		}
 
 		ImagesCollection.prototype = {
@@ -108,7 +109,7 @@
 						_this.imagesFailed++;
 					}
 
-					if((progress = (_this.imagesLoaded + _this.imagesFailed)/Math.ceil(totalImages/4)) && (progress % 1 === 0) && progress < 4) {
+					if(_this.useProgressEvents && (progress = (_this.imagesLoaded + _this.imagesFailed)/Math.ceil(totalImages/4)) && (progress % 1 === 0) && progress < 4) {
 						digestPromise(function() {
 							defer.notify(broadcastMessages.progress[progress-1]);
 						});
@@ -149,7 +150,7 @@
 						cache[source] = new ImageNode(source, increment, true);
 					}
 					else {
-						//Image has not been loaded before, so we make a proxy image element and attach load listeners to it so that we don't interfere with the user defined listeners
+						//Image has not been loaded before, so we make a proxy image element and attach load listeners to it
 						cache[source] = new ImageNode(source, increment);
 
 					}
@@ -168,6 +169,7 @@
 			link : function($scope, $element, $attrs) {
 
 				var descendents = $element[0].childNodes,
+					useProgressEvents = $attrs.useProgressEvents === 'yes' ? true : false,
 					previousImagesCount = 0,
 					imageNodes;
 
@@ -181,7 +183,7 @@
 
 						if(!newVal) return;
 
-						var collection = new ImagesCollection(),
+						var collection = new ImagesCollection(useProgressEvents),
 							imageNodes = makeArray($element.find('img')),
 							currentImageNodes = imageNodes.slice(previousImagesCount);
 
@@ -197,7 +199,7 @@
 
 								},
 								function(progress) {
-									$scope.$broadcast('PROGRESS', {status : progress});
+									useProgressEvents && $scope.$broadcast('PROGRESS', {status : progress});
 								}
 							);
 						});

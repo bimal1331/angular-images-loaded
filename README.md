@@ -22,8 +22,8 @@ http://bimal1331.github.io/angular-images-loaded
   ***Eg.***
 
 	``` html
-  <div data-images-loaded style="margin:3% 0 0 4%; padding: 20px 1% 0; border:1px solid black; width:43%; float:left;">
-		<div data-ng-repeat="image in images" style="border:1px solid black; border-radius:5px; padding:1px; display:inline-block; min-width:150px;">
+  <div data-images-loaded>
+		<div data-ng-repeat="image in images">
 				<img ng-src="http://lorempixel.com/{{image.src}}">
 			  <div>Foo Bar</div>
 		</div>
@@ -87,8 +87,8 @@ http://bimal1331.github.io/angular-images-loaded
   To listen to progress events, use attribute ***data-use-progress-events*** as shown below -
 
   ```html
-  <div data-images-loaded data-use-progress-events="yes" style="margin:3% 0 0 4%; padding: 20px 1% 0; border:1px solid black; width:43%; float:left;">
-  	<div data-ng-repeat="image in images" style="border:1px solid black; border-radius:5px; padding:1px; display:inline-block; min-width:150px;">
+  <div data-images-loaded data-use-progress-events="yes">
+  	<div data-ng-repeat="image in images">
   			<img ng-src="http://lorempixel.com/{{image.src}}"/>
   		  <div>Foo Bar</div>
   	</div>

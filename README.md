@@ -2,7 +2,7 @@ angular-images-loaded
 ---------------------
 ####Image load detector with progress events
 + Detects images load for all images inside an element and broadcasts angular progress events
-+ Works with infinite scroll and pagination.
++ Works with ***ng-repeat***.
 + Can be used on different elements
 
 

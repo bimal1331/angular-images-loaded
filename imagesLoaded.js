@@ -19,24 +19,6 @@
 			$timeout(func, 0);
 		}
 
-		function makeArray(obj) {
-			var arr = [];
-
-			if(angular.isArray(obj)) {
-				arr = obj;
-			}
-			else if(typeof obj.length === 'number') {
-				for(var i = 0, n = obj.length; i < n; i++) {
-					arr.push(obj[i]);
-				}
-			}
-			else {
-				arr.push(obj);
-			}
-
-			return arr;
-		}
-
 		/*********** Constructors ************/
 
 		function ImageNode(src, func, inBrowserCache) {
@@ -184,8 +166,8 @@
 						if(!newVal) return;
 
 						var collection = new ImagesCollection(useProgressEvents),
-							imageNodes = makeArray($element.find('img')),
-							currentImageNodes = imageNodes.slice(previousImagesCount);
+							imageNodes = $element.find('img'),
+							currentImageNodes = Array.prototype.slice.call(imageNodes, previousImagesCount);
 
 						previousImagesCount = imageNodes.length;
 

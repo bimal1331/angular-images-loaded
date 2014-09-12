@@ -46,7 +46,7 @@
 			},
 
 			__onload : function(func, success) {
-				this.loaded = success;
+				this.loaded = true;
 				this.loading = false;
 
 				if(success && this.node) {
@@ -122,8 +122,8 @@
 							cachedElement.bind(increment);
 						}
 						else if(cachedElement.loaded === false) {
-							cachedElement.bind(increment);
-							cachedElement.node.src = source;
+							// cachedElement.bind(increment);
+							// cachedElement.node.src = source;
 						}
 						
 					}
@@ -145,51 +145,58 @@
 			
 		};
 
-		//Directive consfiguration object
+		//Directive configuration object
 		return {
 			restrict : 'A',
-			link : function($scope, $element, $attrs) {
+			compile: function(tElem, tAttrs) {
 
-				var descendents = $element[0].childNodes,
-					useProgressEvents = $attrs.useProgressEvents === 'yes' ? true : false,
-					previousImagesCount = 0,
-					imageNodes;
+				return function($scope, $element, $attrs) {
 
-				$scope.$watch(
-					function() {
-						var nodes = descendents.length;
-						
-						return nodes;
-					},
-					function(newVal) {
+					var descendents = $element[0].childNodes,
+						useProgressEvents = $attrs.useProgressEvents === 'yes' ? true : false,
+						oldImageNodesCount = 0,
+						documentImages = document.images,
+						imageNodes;
 
-						if(!newVal) return;
+					$scope.$watch(
+						function() {
+							return documentImages.length;
+						},
+						function(newVal, oldVal) {
 
-						var collection = new ImagesCollection(useProgressEvents),
-							imageNodes = $element.find('img'),
-							currentImageNodes = Array.prototype.slice.call(imageNodes, previousImagesCount);
+							var newImageNodesCount, collection;
 
-						previousImagesCount = imageNodes.length;
+							if(newVal === oldVal) return;
 
-						digestPromise(function() {
-							collection.whenImagesLoaded(currentImageNodes).then(
-								function(data) {
-									$scope.$broadcast(data);
-									$scope.$broadcast(broadcastMessages.always);
-								},
-								function(error) {
+							imageNodes = $element.find('img');
+							newImageNodesCount = imageNodes.length;
 
-								},
-								function(progress) {
-									useProgressEvents && $scope.$broadcast('PROGRESS', {status : progress});
-								}
-							);
-						});
-						
-					}
-				);
-				
+							if(newImageNodesCount === oldImageNodesCount) return;
+							oldImageNodesCount = newImageNodesCount;
+
+							collection = new ImagesCollection(useProgressEvents);
+
+							digestPromise(function() {
+								collection.whenImagesLoaded(imageNodes).then(
+									function(data) {
+										$scope.$emit(data);
+										$scope.$emit(broadcastMessages.always);
+									},
+									function(error) {
+
+									},
+									function(progress) {
+										useProgressEvents && $scope.$emit('PROGRESS', {status : progress});
+									}
+								);
+							});
+							
+						}
+					);
+
+				}
 			}
+			
 		}
 	}])
 }());

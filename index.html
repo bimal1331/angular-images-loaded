@@ -2,7 +2,7 @@
 <html ng-app="masonryApp">
 <head>
 	<title>Image Gallery</title>
-	<script src="angular.min.js"></script>
+	<script src="angular.js"></script>
 	<script src="imagesLoaded.js"></script>
 	<script src="app.js"></script>
 </head>
@@ -18,7 +18,12 @@
 		</div>
 	</div> -->
 
-	<div style="display:inline-block; width:100%; height:100%">
+	<div data-images-loaded data-use-progress-events="yes" style="display:inline-block; width:100%; height:100%">
+
+		<div style="background:none repeat scroll 0 0 hsla(0, 0%, 0%, 0.9); border-radius:20px; padding:40px; position:fixed; left:40%; top:50px; z-index:2;" ng-show="progress>0">
+			<progress value="{{progress}}" max="30"></progress>
+		</div>
+
 		<div ng-controller="Ctrl1">
 
 			<div style="background:none repeat scroll 0 0 hsla(0, 0%, 0%, 0.9); border-radius:20px; padding:40px; position:fixed; left:20%; top:50px; z-index:2;" ng-show="progress>0">

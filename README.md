@@ -1,9 +1,11 @@
 angular-images-loaded
 ---------------------
 ####Image load detector with progress events
++ Directive can be nested now ***(NEW)***
 + Detects images load for all images inside an element and broadcasts angular progress events
 + Works with ***ng-repeat***.
 + Can be used on different elements
++ Need not worry about asynchronous image elements insertion into DOM
 
 
 #####DEMO
@@ -23,11 +25,36 @@ http://bimal1331.github.io/angular-images-loaded
 
 	``` html
   <div data-images-loaded>
-		<div data-ng-repeat="image in images">
+	<div data-ng-repeat="image in images">
+			<img ng-src="http://lorempixel.com/{{image.src}}">
+		  <div>Foo Bar</div>
+	</div>
+  </div>
+	```
+	
++ You can nest the directive
+
+  ***Eg.***
+  
+  
+	``` html
+  <div data-images-loaded>
+  	..................
+  	
+  	<div data-images-loaded>
+		<div data-ng-repeat="image in images1">
 				<img ng-src="http://lorempixel.com/{{image.src}}">
 			  <div>Foo Bar</div>
 		</div>
 	</div>
+	
+	<div data-images-loaded>
+		<div data-ng-repeat="image in images2">
+				<img ng-src="http://lorempixel.com/{{image.src}}">
+			  <div>Foo Bar</div>
+		</div>
+	</div>
+  </div>
 	```
 
   That's it!
@@ -98,7 +125,7 @@ http://bimal1331.github.io/angular-images-loaded
 + data-use-progress-events="***yes***"  to listen to progress events
 + data-use-progress-events="***no***" to skip progress events and just listen to main events
 	
-  This approach is taken to minimise ***$digest*** cycles in case you wish to skip progress events, since all angular-specific changes take place in the $digest cycle. That's why, I have kept progress events to a minimum, otherwise 30 images load will cause 30 $digest cycles to notify the subscriber, which can hamper performance.
+  This approach is taken to minimise ***$digest*** cycles in case you wish to skip progress events, since all angular-specific changes take place in the $digest cycle. That's why, I have kept progress events to a minimum, otherwise ***N*** images load will cause ***N*** $digest cycles to notify the subscriber, which can hamper performance.
 
 
 #####Credits

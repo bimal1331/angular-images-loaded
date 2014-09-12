@@ -3,7 +3,7 @@ angular.module('masonryApp', ['imagesLoaded'])
 .controller("LoadImages", ['$scope', '$interval', '$timeout', function($scope, $interval, $timeout) {
 
     var busy = false,
-        total = 20,
+        total = 10,
         heights = [undefined, 250, 251, 252, 253, 254],
         cats = ['abstract', 'animals', 'business', 'cats', 'city', 'food', 'nightlife', 'fashion', 'people', 'nature', 'sports', 'transport'],
         stop;
@@ -45,24 +45,16 @@ angular.module('masonryApp', ['imagesLoaded'])
 
     };
 
-    $scope.fetchNext(2);  
+    $timeout(function() {
+        $scope.fetchNext(2);
+    }, 1000); 
 
-}])
-
-.controller("Ctrl1", ['$scope', '$interval', '$timeout', function($scope, $interval, $timeout) {    
-
-    $scope.progress = 0;   
-
-    $scope.$watch('images.length', function(val) {
-        if(val) $scope.progress = 1;
-    }); 
-
-    $scope.addMore = function() {
-        $scope.fetchNext(0);
-    };
+    $scope.progress = 1; 
 
     $scope.$on('PROGRESS', function($event, progress) {
         console.log(progress);
+        $event.stopPropagation();
+
         switch(progress.status) {
             case 'QUARTER':
                 $scope.progress = Math.ceil(30/4);
@@ -75,6 +67,50 @@ angular.module('masonryApp', ['imagesLoaded'])
                 break;
             case 'FULL':
                 $scope.progress = 30;
+                $timeout(function() { $scope.progress = 0; }, 300);
+                break;
+        }
+    }); 
+
+    $scope.$on('SUCCESS', function() {
+        console.log("ALL LOADED");
+    });
+
+}])
+
+.controller("Ctrl1", ['$scope', '$interval', '$timeout', function($scope, $interval, $timeout) {    
+
+    $scope.progress = 0;   
+
+    $scope.$watch('images.length', function(val) {
+        if(val) $scope.progress = 1;
+    }); 
+
+    console.time('time1');
+
+    $scope.addMore = function() {
+        $scope.fetchNext(0);
+        console.time('time1');
+    };
+
+    $scope.$on('PROGRESS', function($event, progress) {
+        console.log(progress);
+
+        $event.stopPropagation();
+
+        switch(progress.status) {
+            case 'QUARTER':
+                $scope.progress = Math.ceil(30/4);
+                break;
+            case 'HALF':
+                $scope.progress = Math.ceil(30/2);
+                break;
+            case 'THREEQUARTERS':
+                $scope.progress = Math.ceil(30*3/4);
+                break;
+            case 'FULL':
+                $scope.progress = 30;
+                console.timeEnd('time1')
                 $timeout(function() { $scope.progress = 0; }, 300);
                 break;
         }
@@ -107,6 +143,8 @@ angular.module('masonryApp', ['imagesLoaded'])
 
     $scope.$on('PROGRESS', function($event, progress) {
         console.log(progress);
+        $event.stopPropagation();
+
         switch(progress.status) {
             case 'QUARTER':
                 $scope.progress = Math.ceil(30/4);

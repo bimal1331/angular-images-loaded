@@ -111,7 +111,7 @@ http://bimal1331.github.io/angular-images-loaded
   ```
   
 #####Note :-
-  To listen to progress events, use attribute ***data-use-progress-events*** as shown below -
+1.  To listen to progress events, use attribute ***data-use-progress-events*** as shown below -
 
   ```html
   <div data-images-loaded data-use-progress-events="yes">
@@ -126,6 +126,8 @@ http://bimal1331.github.io/angular-images-loaded
 + data-use-progress-events="***no***" to skip progress events and just listen to main events
 	
   This approach is taken to minimise ***$digest*** cycles in case you wish to skip progress events, since all angular-specific changes take place in the $digest cycle. That's why, I have kept progress events to a minimum, otherwise ***N*** images load will cause ***N*** $digest cycles to notify the subscriber, which can hamper performance.
+
+2.  Use $event.stopPropagation() in your controller when using progress events and nesting the directive, otherwise you'll receive same notification multiple times.
 
 
 #####Credits

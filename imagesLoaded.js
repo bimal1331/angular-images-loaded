@@ -9,7 +9,7 @@
 
 		var broadcastMessages = {
 			progress : ['QUARTER', 'HALF', 'THREEQUARTERS', 'FULL'],
-			successful : 'SUCCESS',
+			success : 'SUCCESS',
 			complete : 'FAIL',
 			always : 'ALWAYS'
 		};

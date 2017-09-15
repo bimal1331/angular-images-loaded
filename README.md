@@ -15,7 +15,7 @@ http://bimal1331.github.io/angular-images-loaded
 + Angularjs 1.2+ only
 
 #####INSTALLATION
-+ Download imagesLoaded.min.js and include it with your JS files.
++ Download imagesLoaded.js and include it with your JS files.
 + Include module ***imagesLoaded*** in your main app module.
 
 #####USAGE
